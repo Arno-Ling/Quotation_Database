@@ -1,0 +1,20 @@
+#root {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.ant-layout {
+  background: #f0f2f5;
+}
+
+.ant-layout-header {
+  padding: 0 50px;
+}
+
+.ant-layout-content {
+  background: #fff;
+  min-height: 280px;
+  border-radius: 8px;
+  margin: 24px 0;
+}
