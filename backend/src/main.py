@@ -59,8 +59,8 @@ async def startup_event():
     print("=" * 60)
     
     try:
-        # 数据库路径
-        database_path = "../Database"
+        # 数据库路径 - 从环境变量读取，默认为../Database
+        database_path = os.getenv("DATABASE_PATH", "../Database")
         
         # 初始化数据库加载器
         validator = DataValidator()
