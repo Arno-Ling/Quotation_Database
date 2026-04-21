@@ -92,6 +92,13 @@ class APIClient {
   }
 
   /**
+   * 预览PDF文件（在浏览器中打开）
+   */
+  getPDFPreviewURL(partId: string): string {
+    return `/api/parts/${encodeURIComponent(partId)}/pdf?preview=true`;
+  }
+
+  /**
    * 获取所有类别
    */
   async getCategories(): Promise<CategoriesResponse> {

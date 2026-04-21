@@ -83,26 +83,31 @@ class PDFResolver:
             Tuple[Optional[Path], bool]: (PDF路径, 是否为分页PDF)
         """
         category = part.part_category
+        item_name = part.item_name
         source_file = part.source_file
         
-        if not source_file:
-            return None, False
-        
-        # 策略1: 尝试分页PDF (优先)
-        paged_pdf = self.database_path / category / "output_pdf" / source_file
+        # 策略1: 尝试分页PDF - 使用item_name作为文件名 (优先)
+        paged_pdf = self.database_path / category / "output_pdf" / f"{item_name}.pdf"
         if paged_pdf.exists() and paged_pdf.is_file():
             return paged_pdf, True
         
-        # 策略2: 尝试源PDF
+        # 策略2: 尝试分页PDF - 使用source_file作为文件名
+        if source_file:
+            paged_pdf_alt = self.database_path / category / "output_pdf" / source_file
+            if paged_pdf_alt.exists() and paged_pdf_alt.is_file():
+                return paged_pdf_alt, True
+        
+        # 策略3: 尝试源PDF
         source_pdf = self.database_path / category / f"{category}.pdf"
         if source_pdf.exists() and source_pdf.is_file():
             return source_pdf, False
         
-        # 策略3: 尝试其他可能的位置
+        # 策略4: 尝试其他可能的位置
         # 有时source_file可能包含完整路径信息
-        alternative_pdf = self.database_path / category / source_file
-        if alternative_pdf.exists() and alternative_pdf.is_file():
-            return alternative_pdf, True
+        if source_file:
+            alternative_pdf = self.database_path / category / source_file
+            if alternative_pdf.exists() and alternative_pdf.is_file():
+                return alternative_pdf, True
         
         return None, False
     

@@ -11,7 +11,8 @@
 - 🔍 **多条件查询**: 支持按型号代码、附加代码、零件名称、类别等多种条件查询
 - 📊 **数据统计**: 实时统计零件数量、类别分布、PDF覆盖率等信息
 - 📁 **类别浏览**: 按类别组织和浏览零件数据
-- 📄 **PDF管理**: 自动关联和管理零件PDF文档，支持在线查看和下载
+- 📄 **PDF管理**: 自动关联和管理零件PDF文档，支持在线预览和下载
+- 👁️ **PDF预览**: 无需下载即可在浏览器中预览PDF文档
 - 📤 **数据导出**: 支持JSON、CSV、Excel三种格式的数据导出
 - ⚡ **高性能**: 使用多级哈希索引，查询响应时间<100ms
 - 🎨 **现代化UI**: 响应式设计，支持桌面和移动设备
@@ -113,7 +114,8 @@ npm run dev
 1. 在搜索结果中点击"查看"按钮
 2. 查看零件完整信息
 3. 查看PDF文档信息
-4. 点击"下载PDF"按钮下载文档
+4. 点击"预览PDF"按钮在线预览文档（无需下载）
+5. 点击"下载PDF"按钮下载文档到本地
 
 ### 浏览类别
 
@@ -148,7 +150,7 @@ npm run dev
 | `/api/health` | GET | 健康检查 |
 | `/api/parts` | GET | 查询零件列表 |
 | `/api/parts/{part_id}` | GET | 获取零件详情 |
-| `/api/parts/{part_id}/pdf` | GET | 获取PDF信息/下载 |
+| `/api/parts/{part_id}/pdf` | GET | 获取PDF信息/预览/下载 |
 | `/api/categories` | GET | 获取所有类别 |
 | `/api/categories/{category}/parts` | GET | 获取类别零件 |
 | `/api/statistics` | GET | 获取统计信息 |
@@ -165,6 +167,12 @@ curl "http://localhost:8000/api/parts?catalog_type=SJ&limit=10"
 
 # 获取零件详情
 curl "http://localhost:8000/api/parts/凸模_顶料型凸模"
+
+# 预览PDF（在浏览器中打开）
+curl "http://localhost:8000/api/parts/凸模_顶料型凸模/pdf?preview=true"
+
+# 下载PDF
+curl "http://localhost:8000/api/parts/凸模_顶料型凸模/pdf?download=true" -o part.pdf
 
 # 导出数据
 curl "http://localhost:8000/api/export?format=json&catalog_type=SJ" -o parts.json
@@ -255,7 +263,7 @@ system/
 - **自动关联**: 自动关联零件与PDF文档
 - **智能定位**: 优先分页PDF，回退到源PDF
 - **多种路径格式**: 支持绝对路径、相对路径、file:// URL
-- **在线预览**: 支持浏览器内PDF查看
+- **在线预览**: 支持浏览器内PDF预览，无需下载
 - **批量下载**: 支持批量导出PDF路径
 
 ### 3. 数据导出
@@ -411,7 +419,9 @@ MIT License
 
 - 提交 Issue
 - 发送邮件
+- 查看 [PDF预览功能指南](PDF_PREVIEW_GUIDE.md)
 
 ---
 
-**最后更新**: 2026-04-21
+**最后更新**: 2026-04-21  
+**版本**: v1.1.0 - 新增PDF在线预览功能

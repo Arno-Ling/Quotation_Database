@@ -14,8 +14,10 @@ import {
   ArrowLeftOutlined,
   FilePdfOutlined,
   DownloadOutlined,
+  EyeOutlined,
 } from '@ant-design/icons';
 import apiClient from '../services/api';
+import PDFPreviewModal from '../components/PDFPreviewModal';
 import type { Part, PDFInfo } from '../types';
 
 function PartDetailPage() {
@@ -25,6 +27,7 @@ function PartDetailPage() {
   const [part, setPart] = useState<Part | null>(null);
   const [pdfInfo, setPdfInfo] = useState<PDFInfo | null>(null);
   const [error, setError] = useState<string>('');
+  const [previewVisible, setPreviewVisible] = useState(false);
 
   useEffect(() => {
     if (partId) {
@@ -63,6 +66,14 @@ function PartDetailPage() {
       window.open(url, '_blank');
       message.success('正在下载PDF文件...');
     }
+  };
+
+  const handlePreviewPDF = () => {
+    setPreviewVisible(true);
+  };
+
+  const handleClosePreview = () => {
+    setPreviewVisible(false);
   };
 
   if (loading) {
@@ -148,13 +159,21 @@ function PartDetailPage() {
             bordered={false}
             extra={
               pdfInfo.pdf_exists && (
-                <Button
-                  type="primary"
-                  icon={<DownloadOutlined />}
-                  onClick={handleDownloadPDF}
-                >
-                  下载PDF
-                </Button>
+                <Space>
+                  <Button
+                    icon={<EyeOutlined />}
+                    onClick={handlePreviewPDF}
+                  >
+                    预览PDF
+                  </Button>
+                  <Button
+                    type="primary"
+                    icon={<DownloadOutlined />}
+                    onClick={handleDownloadPDF}
+                  >
+                    下载PDF
+                  </Button>
+                </Space>
               )
             }
           >
@@ -184,6 +203,16 @@ function PartDetailPage() {
               </Descriptions.Item>
             </Descriptions>
           </Card>
+        )}
+
+        {/* PDF预览Modal */}
+        {partId && pdfInfo?.pdf_exists && (
+          <PDFPreviewModal
+            visible={previewVisible}
+            onClose={handleClosePreview}
+            pdfUrl={apiClient.getPDFPreviewURL(decodeURIComponent(partId))}
+            title={part?.item_name || ''}
+          />
         )}
       </Space>
     </div>

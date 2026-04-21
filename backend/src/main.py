@@ -6,6 +6,7 @@ from fastapi import FastAPI, HTTPException, Query, Path as PathParam, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 from typing import Optional, List
+from urllib.parse import quote
 import time
 import sys
 import os
@@ -170,7 +171,8 @@ async def get_part(part_id: str = PathParam(..., description="零件ID")):
 async def get_part_pdf(
     part_id: str = PathParam(..., description="零件ID"),
     format: str = Query("absolute", pattern="^(absolute|relative|url)$", description="路径格式"),
-    download: bool = Query(False, description="是否直接下载文件")
+    download: bool = Query(False, description="是否直接下载文件"),
+    preview: bool = Query(False, description="是否预览模式（在浏览器中打开）")
 ):
     """
     获取零件PDF文件
@@ -179,6 +181,7 @@ async def get_part_pdf(
     - format=relative: 返回相对路径
     - format=url: 返回file:// URL
     - download=true: 直接下载PDF文件
+    - preview=true: 在浏览器中预览PDF（不触发下载）
     """
     if not database_loaded:
         raise HTTPException(status_code=503, detail="数据库未加载")
@@ -188,13 +191,30 @@ async def get_part_pdf(
     if not pdf_path:
         raise HTTPException(status_code=404, detail=f"PDF文件不存在: {part_id}")
     
-    if download:
-        # 直接返回PDF文件
-        return FileResponse(
-            pdf_path,
-            media_type="application/pdf",
-            filename=Path(pdf_path).name
-        )
+    if download or preview:
+        # 返回PDF文件
+        filename = Path(pdf_path).name
+        # 对文件名进行URL编码以支持中文
+        encoded_filename = quote(filename)
+        
+        if download:
+            # 下载模式：触发下载
+            return FileResponse(
+                pdf_path,
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"attachment; filename*=utf-8''{encoded_filename}"
+                }
+            )
+        else:
+            # 预览模式：在浏览器中打开，不触发下载
+            return FileResponse(
+                pdf_path,
+                media_type="application/pdf",
+                headers={
+                    "Content-Disposition": f"inline; filename*=utf-8''{encoded_filename}"
+                }
+            )
     else:
         # 返回PDF路径信息
         pdf_info = pdf_resolver.get_pdf_info(part_id)
